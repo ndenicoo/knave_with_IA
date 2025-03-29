@@ -1,0 +1,469 @@
+{
+  "name": "Actualizacion nivel",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -820,
+        0
+      ],
+      "id": "dcf849f3-d9d6-4f63-902d-117b20f7e1cb",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "knave",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.playerID }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        0
+      ],
+      "id": "9614ad55-51dc-423b-ae96-790b77056b70",
+      "name": "Supabase1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JtFULSoO2gRdSFSI",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "message": "¿Quieres combatir de nuevo?",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "✅ Sí",
+            "disapproveLabel": "❌ No"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        280,
+        0
+      ],
+      "id": "907fbc80-20c3-4f42-86b4-95df803e0ae1",
+      "name": "Telegram",
+      "webhookId": "61cf0a77-ba1d-4522-a827-85b3c9b0b13f",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.approved }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "8825c2aa-3a5c-430d-b8cf-1540f8dbbbb9"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "batallar de nuevo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e4befa74-6b1a-48de-a4a5-8a41d94fb8c8",
+                    "leftValue": "={{ $json.data.approved }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fin"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "2e7384db-a818-45a2-8ce2-2923080bcd5f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "dvmteHX6ADN4hTXy",
+          "mode": "list",
+          "cachedResultName": "Batalla"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        760,
+        140
+      ],
+      "id": "bdf57c5d-dcd7-46bb-9530-90be9d4355f8",
+      "name": "Execute batalla"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "483b58a1-0753-4e65-907b-7ea5ae2e885f",
+              "name": "telegram_chat_id",
+              "value": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+              "type": "string"
+            },
+            {
+              "id": "02ac7132-e6b5-4c1c-a6c4-670dc9a17581",
+              "name": "userid",
+              "value": "={{ $('When Executed by Another Workflow').item.json.playerID }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        580,
+        140
+      ],
+      "id": "74386636-6f8f-4f5b-a433-5c8b3eb814c8",
+      "name": "pass_param"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "05535abf-2a6b-4478-956c-d2fe65ed0699",
+              "leftValue": "={{ $json.resultado }}",
+              "rightValue": "Victoria",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -600,
+        200
+      ],
+      "id": "acffbfa2-b935-4fe8-af92-6c8307dd8397",
+      "name": "victoria?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "text": "=¡Enhorabuena! Ganas 50XP con la victoria y +1 punto en tus habilidades.\n\n-Fuerza: {{ $json.fuerza }}\n-Defensa de armadura: {{ $json.armadura_defensa }}\n-PG: {{ $json.PG }}\n-XP: {{ $json.XP }}\n-Nivel: {{ $json.nivel }}\n\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        120,
+        0
+      ],
+      "id": "5c10600c-4db1-48db-8d68-27d9ef5c2bba",
+      "name": "Telegram1",
+      "webhookId": "61cf0a77-ba1d-4522-a827-85b3c9b0b13f",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🎮 Workflow de actualización  \n**Propósito:** Gestión de progresión del personaje  \n**Componentes clave:**  \n- ▶️ **Trigger:** Ejecución desde otros workflow de batalla\n- 🧮 **Lógica de nivel:**  \n  - +50 XP por victoria  \n  - Fórmula de nivel: `50 + 10*(nivel-1)` XP requeridos  \n  - Incremento de atributos (PG, defensa, fuerza) con límite de 20  \n- 🗄️ **Persistencia:**  \n  - Actualización en tiempo real en Supabase  \n- 🤖 **Comunicación:**  \n  - Notificación por Telegram con nuevos stats  \n  - Menú interactivo para repetir combate  ",
+        "height": 320,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -400,
+        -380
+      ],
+      "typeVersion": 1,
+      "id": "737b8860-2eac-4da4-8bb2-96dae90f9ae4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "function updateLevel(character) {\n    let { XP, nivel, PG, armadura_defensa, fuerza } = character;\n    let XP_gained = 50;\n    XP += XP_gained;\n    \n    // Calculate XP required for each level\n    let requiredXP = 50 + (nivel - 1) * 10;\n    \n    // Level up while XP exceeds the required amount\n    while (XP >= requiredXP) {\n        XP -= requiredXP;\n        nivel++;\n        requiredXP = 50 + (nivel - 1) * 10;\n        \n        // Increase attributes with a max value of 20\n        PG = Math.min(PG + 1, 20);\n        armadura_defensa = Math.min(armadura_defensa + 1, 20);\n        fuerza = Math.min(fuerza + 1, 20);\n    }\n    \n    return { nivel, XP, PG, armadura_defensa, fuerza };\n}\n\nconst XP = $input.first().json.XP;\nconst nivel = $input.first().json.nivel;\nconst PG = $input.first().json.PG;\nconst armadura_defensa = $input.first().json.armadura_defensa;\nconst fuerza = $input.first().json.fuerza;\n\nreturn updateLevel({ XP, nivel, PG, armadura_defensa, fuerza });\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        0
+      ],
+      "id": "244914fe-ce93-4913-aa95-997a61a9918e",
+      "name": "Mejoras de subir de nivel"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "knave",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Supabase1').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "XP",
+              "fieldValue": "={{ $json.XP }}"
+            },
+            {
+              "fieldId": "nivel",
+              "fieldValue": "={{ $json.nivel }}"
+            },
+            {
+              "fieldId": "PG",
+              "fieldValue": "={{ $json.PG }}"
+            },
+            {
+              "fieldId": "armadura_defensa",
+              "fieldValue": "={{ $json.armadura_defensa }}"
+            },
+            {
+              "fieldId": "fuerza",
+              "fieldValue": "={{ $json.fuerza }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        0
+      ],
+      "id": "2f6a09ed-9b45-48c9-be93-c79840d458b7",
+      "name": "Update stats",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JtFULSoO2gRdSFSI",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "telegram_chat_id": "1449868173",
+          "playerID": "b58f513a-3bf9-4a4f-9502-98ac0a85fddd"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "victoria?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase1": {
+      "main": [
+        [
+          {
+            "node": "Mejoras de subir de nivel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "pass_param",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pass_param": {
+      "main": [
+        [
+          {
+            "node": "Execute batalla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "victoria?": {
+      "main": [
+        [
+          {
+            "node": "Supabase1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mejoras de subir de nivel": {
+      "main": [
+        [
+          {
+            "node": "Update stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update stats": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "328cc807-8ecd-401c-b3f6-e213360720c9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fb40b9a4f57084950ea960f301b80dd1b977e702e7cf3108b98e299d24cc0fa3"
+  },
+  "id": "7jXn2zd6EROIK22i",
+  "tags": []
+}

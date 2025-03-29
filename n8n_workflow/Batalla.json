@@ -1,0 +1,636 @@
+{
+  "name": "Batalla",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://seleccion-monstruos-731ccef60971.herokuapp.com/monstruo/aleatorio",
+        "options": {}
+      },
+      "name": "Obtener Monstruo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        320,
+        220
+      ],
+      "id": "33caf0fd-08a9-4472-94f5-f5a6700d6314"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Preparamos los datos para el combate\nconst monstruo = $json['stats'];\n\nmonstruo.pg = parseInt(monstruo.hit_dice.split('+')[0]) * 4; // Conversión HD a HP\nmonstruo.defensa_armadura = parseInt(monstruo.armor_class.split(' ')[0]);\n\nreturn {\n  monstruos: [{\n    nombre: $json['name'],\n    pg: monstruo.pg,\n    defensa_armadura: monstruo.defensa_armadura,\n    fuerza_bonus: monstruo.hit_dice,\n    dado_ataque: monstruo.damage\n  }]\n};"
+      },
+      "name": "Preparar Combate",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        460,
+        220
+      ],
+      "id": "2035e1e7-77d6-443f-bd33-3d5cda84be08",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b62eb099-c8d3-4deb-b1f1-4e7e74d0c2ff",
+              "name": "playerID",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "2e7f4357-ccc1-4a1b-9374-57d2db588ef1",
+              "name": "playerName",
+              "value": "={{ $json.pjname }}",
+              "type": "string"
+            },
+            {
+              "id": "b3fd1a62-a884-4463-a072-4f3d4b90e547",
+              "name": "PG",
+              "value": "={{ $json.PG }}",
+              "type": "string"
+            },
+            {
+              "id": "d57932fe-95bb-4184-811d-5aa0de983e58",
+              "name": "bonusFuerza",
+              "value": "={{ $json.fuerza }}",
+              "type": "string"
+            },
+            {
+              "id": "b5e216c3-2e3f-4f75-9f5b-44fd766df23a",
+              "name": "defensaArmadura",
+              "value": "={{ $json.armadura_defensa }}",
+              "type": "string"
+            },
+            {
+              "id": "71f71d72-a9be-44ae-8fbf-8d14f9b48c02",
+              "name": "telegram_id_chat",
+              "value": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        60,
+        220
+      ],
+      "id": "d7f9a446-2587-432c-b035-5addfe5d604a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields').item.json.telegram_id_chat }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1000,
+        220
+      ],
+      "id": "327f4dc7-2aac-4755-8bf8-c1cd9075a77a",
+      "name": "Telegram",
+      "webhookId": "3b12d28b-a631-407a-ba00-6aedbc320509",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields').item.json.telegram_id_chat }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2180,
+        220
+      ],
+      "id": "f1f37ced-d5c6-4d7e-9aa8-33836158f40f",
+      "name": "Telegram1",
+      "webhookId": "3b12d28b-a631-407a-ba00-6aedbc320509",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un Game Master del juego de rol Knave. Tu misión es preparar la batalla del jugador contra un monstruo. El jugador presenta las siguientes características:\n\nNombre: {{ $('Edit Fields').item.json.playerName }}\nBonus de fuerza: {{ $('Edit Fields').item.json.bonusFuerza }}\nAtaque de arma: 1d6\nDefensa de armadura: {{ $('Edit Fields').item.json.defensaArmadura }}\nPG: {{ $('Edit Fields').item.json.PG }}\n\nLas características del monstruo son las siguientes:\nNombre:{{ $('Obtener Monstruo').item.json.name }}\nDescripción: {{ $('Obtener Monstruo').item.json.description }}\nNúmero de monstruos: {{ $('Obtener Monstruo').item.json.stats.save_as }}\nBonus de fuerza: {{ $json.monstruos[0].fuerza_bonus }}\nAtaque de arma: {{ $json.monstruos[0].dado_ataque }}\nDefensa de armadura:{{ $json.monstruos[0].defensa_armadura }}\nPG: {{ $json.monstruos[0].pg }}\n\n**Instrucciones para el GM**\n1. Narra el encuentro de manera inmersiva. Describe el entorno, la aparición del monstruo y las reacciones del jugador. Usa un tono épico y evocador. \nMantén esto breve.\n\n2. Ajusta el encuentro si es necesario. Debes modificar las características del monstruo (estadísticas y número de enemigos) para que el combate sea desafiante pero justo. Trata que el número de monstruos sea pequeño.\n\n3. Explica las características del monstruo. Sigue el siguiente esquema: \nNombre:\nNúmero de monstruos: \nBonus de fuerza:\nAtaque de arma: \nDefensa de armadura:\nPG: \n\n\n\n\n\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        660,
+        220
+      ],
+      "id": "a303cfdc-13b9-4c09-be0c-3c0aa05c3672",
+      "name": "Agente de monstruos"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un Game Master del juego de rol Knave. Tu misión es llamar a una herramienta para que se desarrolle la partida. El jugador presenta las siguientes características:\n\nNombre: {{ $('Edit Fields').item.json.playerName }}\nBonus de fuerza: {{ $('Edit Fields').item.json.bonusFuerza }}\nAtaque de arma: 1d6\nDefensa de armadura: {{ $('Edit Fields').item.json.defensaArmadura }}\nPG: {{ $('Edit Fields').item.json.PG }}\n\nEl enemigo ya ha aparecido y presenta las siguientes características:\n{{ $json.output }}\n\nLlama a la herramienta para que se desarrolle la partida. Llámala pasándole un json de la siguiente forma: \n\nResponde siguiendo el siguiente esquema\n{\"pj\":{\"nombre\":,\"fuerza_bonus\":,\"defensa_armadura\":,\"pg\":},\"monstruos\":[{\"nombre\":\"\",\"pg\":,\"defensa_armadura\":,\"fuerza_bonus\":,\"dado_ataque\":, \"num_monstruos\":}]}\n\nA continuación tienes un ejemplo,\n{\"pj\":{\"nombre\":\"Kael\",\"fuerza_bonus\":2,\"defensa_armadura\":12,\"pg\":11},\"monstruos\":[{\"nombre\":\"Orco\",\"pg\":8,\"defensa_armadura\":11,\"fuerza_bonus\":1,\"dado_ataque\":6, \"num_monstruos\":2}]}\n\n**Atención** \n- En el campo de \"nombre\" puedes poner un string. En los demás solo puedes poner un número. En el caso de dado_ataque, si el dado es 1d6, escribe \"dado_ataque\":6. Si el dado es 1d8, escribe \"dado_ataque\":8.\n- En el campo num_monstruos escribe el número de monstruos \n- Contesta solo con el formato que se pida. No añadas texto adicional.\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1160,
+        220
+      ],
+      "id": "0965f13d-3143-4060-8a41-c8a66d45f7ea",
+      "name": "Creador de la batalla"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un Game Master experto en el juego de rol Knave, con un estilo narrativo emocionante y evocador. Una batalla ha tenido lugar en el siguiente contexto: {{ $('Agente de monstruos').item.json.output }}\nEsta ha sido la batalla: {{ $json.log }}\n\nNarra únicamente el desenlace de la batalla y su resultado directo. Indica quién ha caído (el personaje o el monstruo) y describe brevemente el impacto inmediato de la victoria o derrota. Mantén la narración concisa en torno a 100 palabras, adaptando el tono al género de la partida (épico, trágico, etc.).",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1840,
+        220
+      ],
+      "id": "e5388293-5fc7-4ed0-9175-9c1110b3e528",
+      "name": "Narrador de la batalla"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "=https://knave-combate-12ee3907e5a6.herokuapp.com/combate",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={{ $json.output }}",
+        "headerParametersJson": "{\"Content-Type\":\"application/json\"}"
+      },
+      "name": "Simular Combate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        220
+      ],
+      "id": "6ec0e113-c3c6-4213-b029-47176969df2c",
+      "alwaysOutputData": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        220
+      ],
+      "id": "eac9fc42-2440-4682-b344-faf1bb5f7cef",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "knave",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.userid }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        220
+      ],
+      "id": "3144f970-1443-4176-b1fe-c325600b26cf",
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JtFULSoO2gRdSFSI",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "7jXn2zd6EROIK22i",
+          "mode": "list",
+          "cachedResultName": "Actualizacion nivel"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2580,
+        220
+      ],
+      "id": "fdeb8c33-7915-4cf0-8936-ff31055b3c8f",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields').item.json.telegram_id_chat }}",
+        "text": "= {{ $json.log }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1680,
+        220
+      ],
+      "id": "2b5ae0d2-0c4e-4100-af56-a5df71a2eda7",
+      "name": "Telegram2",
+      "webhookId": "3b12d28b-a631-407a-ba00-6aedbc320509",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1180,
+        500
+      ],
+      "id": "2ed1e403-d847-4e44-a5dc-05794397be59",
+      "name": "gpt-4o-mini",
+      "credentials": {
+        "openAiApi": {
+          "id": "zMvHM6jeeQxMEFVr",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        500
+      ],
+      "id": "696300ab-e3e0-4c14-b245-54b2a1795d61",
+      "name": "gpt-4o",
+      "credentials": {
+        "openAiApi": {
+          "id": "zMvHM6jeeQxMEFVr",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "483b58a1-0753-4e65-907b-7ea5ae2e885f",
+              "name": "telegram_chat_id",
+              "value": "={{ $json.result.chat.id }}",
+              "type": "string"
+            },
+            {
+              "id": "02ac7132-e6b5-4c1c-a6c4-670dc9a17581",
+              "name": "playerID",
+              "value": "={{ $('Edit Fields').item.json.playerID }}",
+              "type": "string"
+            },
+            {
+              "id": "afc6ab18-588b-4bea-867f-97c87c74e007",
+              "name": "resultado",
+              "value": "={{ $('Simular Combate').item.json.resultado }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2400,
+        220
+      ],
+      "id": "d9bf81de-e9b4-435a-9964-7918c0b41be9",
+      "name": "pass_param"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields').item.json.telegram_id_chat }}",
+        "text": "=Preparando la batalla...",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        180,
+        220
+      ],
+      "id": "eac40a7e-bdcc-434e-958f-579a1edc0209",
+      "name": "Telegram3",
+      "webhookId": "3b12d28b-a631-407a-ba00-6aedbc320509",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## ⚔️ Workflow de batalla  \n**Propósito:** Simulación de combates adaptados a Knave\n**Flujo de combate:**  \n1. 🧌 **Generación de enemigo:**  \n   - Microservicio para elegir monstruos de forma aleatorio\n   - Adaptación del GM de stats (PG, armadura, ataque)  \n2. 📖 **Narrativa:**  \n   - GPT-4o para descripción épica del encuentro\n   - Se narra tanto el principio como el desenlace de la batalla  \n3. ⚡ **Mecánicas:**  \n   - Resolución de combate vía microservicio externa  \n4. 🏆 **Post-combate:**  \n   - Notificación de resultados por Telegram  ",
+        "height": 340,
+        "width": 920
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        860,
+        -220
+      ],
+      "typeVersion": 1,
+      "id": "12de5bcf-c39c-4b6c-b28f-517d5ec367ac",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "telegram_chat_id": 1449868173,
+          "userid": "7c7289d7-a111-466d-8fc2-2c029492aeae"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Obtener Monstruo": {
+      "main": [
+        [
+          {
+            "node": "Preparar Combate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Combate": {
+      "main": [
+        [
+          {
+            "node": "Agente de monstruos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Obtener Monstruo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Telegram3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Creador de la batalla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente de monstruos": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Creador de la batalla": {
+      "main": [
+        [
+          {
+            "node": "Simular Combate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Narrador de la batalla": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simular Combate": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Creador de la batalla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "pass_param",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram2": {
+      "main": [
+        [
+          {
+            "node": "Narrador de la batalla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-4o-mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Creador de la batalla",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-4o": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente de monstruos",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Narrador de la batalla",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pass_param": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram3": {
+      "main": [
+        [
+          {
+            "node": "Obtener Monstruo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "52033983-d972-438b-970b-07049d4a71ee",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fb40b9a4f57084950ea960f301b80dd1b977e702e7cf3108b98e299d24cc0fa3"
+  },
+  "id": "dvmteHX6ADN4hTXy",
+  "tags": []
+}

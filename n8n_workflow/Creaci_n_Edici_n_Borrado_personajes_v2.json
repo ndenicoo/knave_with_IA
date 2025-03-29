@@ -1,0 +1,1184 @@
+{
+  "name": "Creación/Edición/Borrado personajes v2",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1e940416-73eb-4f0c-8dfa-4077e9fbeb36",
+                    "leftValue": "={{ $json.next_step }}",
+                    "rightValue": "crear",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "crear"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "36bd2fa7-ceb7-436e-9b12-bb5cf706f556",
+                    "leftValue": "={{ $json.next_step }}",
+                    "rightValue": "editar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "editar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b129fc06-ea0a-4f36-bf87-1682aad60adb",
+                    "leftValue": "={{ $json.next_step }}",
+                    "rightValue": "eliminar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "eliminar"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -840,
+        500
+      ],
+      "id": "d1c5f15c-62d4-43d6-9562-d53b86a08b3e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1260,
+        500
+      ],
+      "id": "52b018ce-fcc5-4fb1-9a87-7fb8209ba151",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"next_step\": \"{{ $json.next_step }}\"\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1040,
+        500
+      ],
+      "id": "374c637c-d97d-4840-8191-5a6d9123a442",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un Game Master del juego de rol Knave. El usuario acaba de crear a su personaje (PJ) con las siguientes características.\n-Nombre: {{ $('Telegram: crear pj').item.json.data['Nombre del PJ'] }}\n-Armadura: {{ $('Telegram: crear pj').item.json.data['Armadura (¡la que más te guste!)'] }}\n-Arma: {{ $('Telegram: crear pj').item.json.data['Arma (¡la que tú quieras)'] }}\n-Físico: {{ $('Telegram: crear pj').item.json.data['Físico (¿cómo te imaginas a tu personaje?)'] }}\n\nTu misión es dar una bienvenida al personaje, explicando su origen basadote en sus características. Además, tieenes que crear las características aleatorias del personaje.\n- Fuerza: tira tres dados 1d6 y el valor menor será la fuerza\n- Armadura: igual que la fuerza + 10\n- PG: tira 1d8",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -160,
+        180
+      ],
+      "id": "e1750640-8a9f-42f5-9b7a-b7314324b3e2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -200,
+        340
+      ],
+      "id": "930cc681-2397-4532-9bad-ffcef9ab6f65",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "zMvHM6jeeQxMEFVr",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu misión es analizar el texto y devolver las características aleatoria en el siguiente formato:\n{fuerza:, armadura:, PG:}\n\nPor ejemplo:\n{fuerza:3, armadura:12, PG:5}\n\nEl texto es el siguiente:\n{{ $('AI Agent').item.json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        320,
+        180
+      ],
+      "id": "1165f931-28e3-41bd-b328-f43ea8c046e0",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        180
+      ],
+      "id": "9a67739a-a706-4b79-a974-c86669cdff2c",
+      "name": "Telegram: origen personaje",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "message": "¡Es hora de crear a tu personaje! Haz click en el siguiente recuadro para crear a tu personaje.",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nombre del PJ",
+              "placeholder": "Kael",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Armadura (¡la que más te guste!)",
+              "placeholder": "Cuero, acolchada, cota de malla...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Arma (¡la que tú quieras)",
+              "placeholder": "Daga, espada larga, ballesta, arco...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Físico (¿cómo te imaginas a tu personaje?)",
+              "placeholder": "De físico atlético, con la cara hinchada, cicatriz de guerra, pelo largo...",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "messageButtonLabel": "Crear personaje",
+          "responseFormTitle": "Crea tu personaje personalizado",
+          "responseFormDescription": "Los atributos de tu personaje sólo sirven para mejorar la narración del juego. Si tienes dudas, no te preocupes, podrás modificarlos luego."
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -440,
+        200
+      ],
+      "id": "52c8b1d9-9ec9-4d93-9b87-a552b338ca40",
+      "name": "Telegram: crear pj",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $input.first().json.output;\n\n// Convert it into a valid JSON string\nconst validJsonString = output.replace(/(\\w+):/g, '\"$1\":'); \n\n// Parse the JSON string into an object\nconst parsedOutput = JSON.parse(validJsonString);\n\nconst fuerza = parsedOutput.fuerza;\nconst armadura = parsedOutput.armadura;\nconst PG = parsedOutput.PG;\n\nconsole.log(parsedOutput);\nconsole.log(fuerza);\n\n// Return each element separately in an object\nreturn {\n  fuerza: fuerza,\n  armadura: armadura,\n  PG: PG\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        180
+      ],
+      "id": "30d234a4-e663-4718-b4d1-0885e757eaaf",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "message": "Para editar tu personaje haz click en el siguiente recuadro para crear a tu personaje. Recuerda que solo puedes editar los atributos físicos.",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nombre del PJ",
+              "placeholder": "Kael",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Armadura (¡la que más te guste!)",
+              "placeholder": "Cuero, acolchada, cota de malla...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Arma (¡la que tú quieras)",
+              "placeholder": "Daga, espada larga, ballesta, arco...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Físico (¿cómo te imaginas a tu personaje?)",
+              "placeholder": "De físico atlético, con la cara hinchada, cicatriz de guerra, pelo largo...",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "messageButtonLabel": "Editar personaje",
+          "responseFormTitle": "Crea tu personaje personalizado",
+          "responseFormDescription": "Los atributos de tu personaje sólo sirven para mejorar la narración del juego. "
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -380,
+        500
+      ],
+      "id": "d201ec02-452e-4b5d-92c5-42e8ef0d9cbf",
+      "name": "Telegram: editar pj",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "text": "Atributos actualizados.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        60,
+        500
+      ],
+      "id": "368ebaac-71ee-427d-984d-a69d8f50d2c2",
+      "name": "Telegram: editar pj1",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "message": "¿Estas seguro que quieres eliminar tu personaje? Esta acción no se puede deshacer.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "✅ Sí",
+            "disapproveLabel": "❌ No"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        680
+      ],
+      "id": "f1d0a986-2693-474c-b9da-c0b0e03ccad8",
+      "name": "Telegram: eliminar pj2",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.approved }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "ee9f6458-c1bb-4914-96dd-f811c3723994"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "eliminar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3414417e-a912-49a4-b79c-19ed0f1adc35",
+                    "leftValue": "={{ $json.data.approved }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cancelar"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -460,
+        680
+      ],
+      "id": "b60bbf0f-80cb-4a69-8dd0-aa2dc8b40b00",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "text": "Personaje eliminado.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -20,
+        720
+      ],
+      "id": "3ea8a2a0-7a93-4e38-82c0-0044c89b2cb2",
+      "name": "Telegram: eliminar pj",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "message": "Selecciona tu próxima acción",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Empezar a batallar",
+            "disapproveLabel": "Editar/Eliminar personaje"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1060,
+        320
+      ],
+      "id": "a88ef2f6-ef89-45c0-8895-40c008d6f107",
+      "name": "Telegram: next_setp",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "message": "¿Quieres editar o eliminar tu personaje? Recuerda, solo puedes editar los atributos físicos.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Editar personaje",
+            "disapproveLabel": "Eliminar personaje"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1080,
+        640
+      ],
+      "id": "0315dd8f-68f7-48e8-b242-a6bb3e4473b1",
+      "name": "Telegram: next_setp1",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.approved }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "87d074b3-ec6c-456c-9dbe-362df19e5339"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "editar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4b53b801-b413-4b21-bd15-54eb0e78e3cc",
+                    "leftValue": "={{ $json.data.approved }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "eliminar"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1240,
+        640
+      ],
+      "id": "b2a11c2d-8375-43b6-abe6-e55574125799",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "knave",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.players.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "armadura",
+              "fieldValue": "={{ $json.data['Armadura (¡la que más te guste!)'] }}"
+            },
+            {
+              "fieldId": "arma",
+              "fieldValue": "={{ $json.data['Arma (¡la que tú quieras)'] }}"
+            },
+            {
+              "fieldId": "fisico",
+              "fieldValue": "={{ $json.data['Físico (¿cómo te imaginas a tu personaje?)'] }}"
+            },
+            {
+              "fieldId": "pjname",
+              "fieldValue": "={{ $json.data['Nombre del PJ'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        500
+      ],
+      "id": "5655d699-a90a-4343-a423-db3c30f2dc7f",
+      "name": "Supabase: editar",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JtFULSoO2gRdSFSI",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "knave",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.players.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "armadura",
+              "fieldValue": "={{ $('Telegram: crear pj').item.json.data['Armadura (¡la que más te guste!)'] }}"
+            },
+            {
+              "fieldId": "fuerza",
+              "fieldValue": "={{ $json.fuerza }}"
+            },
+            {
+              "fieldId": "PG",
+              "fieldValue": "={{ $json.PG }}"
+            },
+            {
+              "fieldId": "XP",
+              "fieldValue": "0"
+            },
+            {
+              "fieldId": "nivel",
+              "fieldValue": "1"
+            },
+            {
+              "fieldId": "arma",
+              "fieldValue": "={{ $('Telegram: crear pj').item.json.data['Arma (¡la que tú quieras)'] }}"
+            },
+            {
+              "fieldId": "fisico",
+              "fieldValue": "={{ $('Telegram: crear pj').item.json.data['Físico (¿cómo te imaginas a tu personaje?)'] }}"
+            },
+            {
+              "fieldId": "armadura_defensa",
+              "fieldValue": "={{ $json.armadura }}"
+            },
+            {
+              "fieldId": "pjname",
+              "fieldValue": "={{ $('Telegram: crear pj').item.json.data['Nombre del PJ'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        860,
+        160
+      ],
+      "id": "c8d679e5-c69a-41c3-a96b-46a399c66af9",
+      "name": "Supabase: crear",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JtFULSoO2gRdSFSI",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.approved }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "ee9f6458-c1bb-4914-96dd-f811c3723994"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "batalla"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3414417e-a912-49a4-b79c-19ed0f1adc35",
+                    "leftValue": "={{ $json.data.approved }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "editar/eliminar"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1240,
+        320
+      ],
+      "id": "ee7a9e96-2685-41ed-bc08-2c9d43c30189",
+      "name": "Switch4"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "dvmteHX6ADN4hTXy",
+          "mode": "list",
+          "cachedResultName": "Batalla"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        300
+      ],
+      "id": "40fc3744-844c-425b-a4a6-299aa7cf43f8",
+      "name": "Execute batalla"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "483b58a1-0753-4e65-907b-7ea5ae2e885f",
+              "name": "telegram_chat_id",
+              "value": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+              "type": "string"
+            },
+            {
+              "id": "02ac7132-e6b5-4c1c-a6c4-670dc9a17581",
+              "name": "userid",
+              "value": "={{ $('When Executed by Another Workflow').item.json.players.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1440,
+        300
+      ],
+      "id": "f85f6d43-ab45-4866-95d8-38c01181b436",
+      "name": "pass_param"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.telegram_chat_id }}",
+        "text": "Creando personaje...",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -300,
+        200
+      ],
+      "id": "6c552483-327b-4f5d-a585-7726eb206da0",
+      "name": "Telegram: crear pj2",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🧑🎨 Workflow de Creacion, Edicion y Borrado de personajes  \n**Propósito:** Administración de personajes  \n**Funcionalidades:**  \n- 🆕 **Creación:**  \n  - Formulario interactivo en Telegram  \n  - Narración de con GPT-4o (historia + stats)  \n  - Persistencia en Supabase  \n- ✏️ **Edición:**  \n  - Modificación de atributos físicos  \n  - Actualización en base de datos  \n- 🗑️ **Eliminación:**  \n  - Confirmación en dos pasos  \n  - Borrado seguro de registros \n  - Redirección automática a la creación de personaje \n- 🔄 **Redirección inteligente:**  \n  - Menú post-creación para combate/edición  ",
+        "height": 400,
+        "width": 1120
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -220,
+        -340
+      ],
+      "typeVersion": 1,
+      "id": "ae7c7a51-7a5d-4837-ab34-d7cc78cc08b1",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "telegram_chat_id": 1449868173,
+          "players": {
+            "id": "15cb5ce2-449f-4798-ba78-56e965069ec1"
+          },
+          "playerName": "ana",
+          "next_step": "crear"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Telegram: crear pj",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: editar pj",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: eliminar pj2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram: origen personaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: origen personaje": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: crear pj": {
+      "main": [
+        [
+          {
+            "node": "Telegram: crear pj2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Supabase: crear",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: editar pj": {
+      "main": [
+        [
+          {
+            "node": "Supabase: editar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: eliminar pj2": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Telegram: eliminar pj",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: next_setp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: eliminar pj": {
+      "main": [
+        [
+          {
+            "node": "Telegram: crear pj",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: editar pj1": {
+      "main": [
+        [
+          {
+            "node": "Telegram: next_setp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: next_setp": {
+      "main": [
+        [
+          {
+            "node": "Switch4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: next_setp1": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Telegram: editar pj",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: eliminar pj2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Supabase: editar": {
+      "main": [
+        [
+          {
+            "node": "Telegram: editar pj1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase: crear": {
+      "main": [
+        [
+          {
+            "node": "Telegram: next_setp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "pass_param",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: next_setp1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pass_param": {
+      "main": [
+        [
+          {
+            "node": "Execute batalla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: crear pj2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e6dd857a-ab12-4b88-89b6-55fe15237e84",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fb40b9a4f57084950ea960f301b80dd1b977e702e7cf3108b98e299d24cc0fa3"
+  },
+  "id": "JM99OhwFjowpstBW",
+  "tags": []
+}

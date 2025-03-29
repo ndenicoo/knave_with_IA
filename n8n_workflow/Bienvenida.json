@@ -1,0 +1,895 @@
+{
+  "name": "Bienvenida",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "71267ae2-efca-48e3-b36f-51a73835045c",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -120,
+        -100
+      ],
+      "id": "74b78832-d4bb-41e6-a6e7-092bc2ef5888",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -560,
+        -100
+      ],
+      "id": "671671df-303f-4bd2-8759-54cfb6949566",
+      "name": "Inicio",
+      "webhookId": "a92bc17d-292c-40ac-9807-bc1e1a4c033c",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Inicio').item.json.message.chat.id }}",
+        "message": "Escribe tu usuario y contraseña en el siguiente cuadro.",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Usuario",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Contraseña",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "messageButtonLabel": "Registro",
+          "responseFormTitle": "",
+          "responseFormDescription": "",
+          "responseFormButtonLabel": "Submit"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        100,
+        100
+      ],
+      "id": "6db6d66b-01ea-43b6-9210-96dc7df3c999",
+      "name": "Telegram: solicitud registro",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "notesInFlow": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Inicio').item.json.message.chat.id }}",
+        "message": "Envíame tu usuario y contraseña en el siguiente recuadro.",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Usuario",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Contraseña",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "messageButtonLabel": "Inicia sesión"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        100,
+        -225
+      ],
+      "id": "73c9a8ec-002a-4942-b30f-9824342a9c35",
+      "name": "Telegram: log in",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Inicio').item.json.message.chat.id }}",
+        "message": "¡Bienvenido! Selecciona Registrarme si nunca has jugado ó de lo contrario selecciona Iniciar Sesión.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Iniciar sesión",
+            "disapproveLabel": "Registrarme"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -340,
+        -100
+      ],
+      "id": "5ffa5bd3-6aa3-45fa-b565-247af9f9b319",
+      "name": "Telegram: sing_up/log_in",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bf8f71a1-04dc-4e4c-b363-750b22e143b2",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        618,
+        -300
+      ],
+      "id": "a7377443-1577-4d3c-ae4e-081e0b037d84",
+      "name": "log_in correcto?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Inicio').item.json.message.chat.id }}",
+        "text": "Usuario o contraseña erróneo. Introdúcelos de nuevo por favor.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        916,
+        -225
+      ],
+      "id": "0ef5657c-99c6-4cab-b415-38d006a6a6af",
+      "name": "log_in=erroneo",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        628,
+        320
+      ],
+      "id": "951ea6ad-47cf-406a-b3ad-86b8febbf50f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "zMvHM6jeeQxMEFVr",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI Game Master (GM) for the tabletop role-playing game Knave. Your purpose is to guide players through thrilling, unpredictable, and immersive adventures in a medieval fantasy world.\n\nSe acaba de registrar al juego el usuario  {{ $('Telegram: solicitud registro').item.json.data.Usuario }}. Dale una cálida bienvenida. No le preguntes nada, solo dale la bienvenida.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        540,
+        100
+      ],
+      "id": "9577a5b4-3928-4f0f-9056-ffc33f68aacf",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Inicio').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        916,
+        100
+      ],
+      "id": "497b6caa-cef5-442d-b650-b996bc44ff24",
+      "name": "Bienvenida",
+      "webhookId": "ceeb22d0-677e-4624-803a-0f861666b184",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"telegram_chat_id\": {{ $json.result.chat.id }},\n  \"players.id\": \"{{ $('Supabase: registro').item.json.id }}\",\n  \"playerName\": \"{{ $('Telegram: solicitud registro').item.json.data.Usuario }}\",\n  \"next_step\": \"crear\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        100
+      ],
+      "id": "52052f7d-cc8a-4f85-bcdd-c3706b93c5f2",
+      "name": "datos_next_flujo"
+    },
+    {
+      "parameters": {
+        "tableId": "knave",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "username",
+              "fieldValue": "={{ $json.data.Usuario }}"
+            },
+            {
+              "fieldId": "password",
+              "fieldValue": "={{ $json.data['Contraseña'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        320,
+        100
+      ],
+      "id": "1e5d3213-02f0-46fe-8ef0-57be242ffd2c",
+      "name": "Supabase: registro",
+      "credentials": {
+        "supabaseApi": {
+          "id": "JtFULSoO2gRdSFSI",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "knave",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "username",
+              "keyValue": "={{ $json.data.Usuario }}"
+            },
+            {
+              "keyName": "password",
+              "keyValue": "={{ $json.data['Contraseña'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -300
+      ],
+      "id": "988deaf5-9670-4d9a-a541-97e4388d3553",
+      "name": "Supabase: inicio sesión",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "JtFULSoO2gRdSFSI",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Inicio').item.json.message.from.id }}",
+        "message": "Selecciona tu próxima acción",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Empezar a batallar",
+            "disapproveLabel": "Editar/Eliminar personaje"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -480
+      ],
+      "id": "a8cbbc90-7b72-4c53-9cbb-b309ec3d1655",
+      "name": "Telegram: next_setp",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Inicio').item.json.message.chat.id }}",
+        "message": "¿Quieres editar o eliminar tu personaje? Recuerda, solo puedes editar los atributos físicos.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Editar personaje",
+            "disapproveLabel": "Eliminar personaje"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        -120
+      ],
+      "id": "c71e0dd4-f20d-4a57-862f-492ced7aab39",
+      "name": "Telegram: next_setp1",
+      "webhookId": "4713fd69-d4e1-45ad-b4a9-17ae9a276f74",
+      "credentials": {
+        "telegramApi": {
+          "id": "vmBBxlZx4gC4yMvI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.approved }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "ee9f6458-c1bb-4914-96dd-f811c3723994"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "batalla"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3414417e-a912-49a4-b79c-19ed0f1adc35",
+                    "leftValue": "={{ $json.data.approved }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "editar/eliminar"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1200,
+        -320
+      ],
+      "id": "c7885523-e201-4bc7-bbcd-ca1a508c876a",
+      "name": "Switch4"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"telegram_chat_id\": {{ $('Inicio').item.json.message.from.id }},\n  \"userid\": \"{{ $('Supabase: inicio sesión').item.json.id }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1520,
+        -340
+      ],
+      "id": "7eb4b0dc-42ae-4b65-a8a7-e4841825ea69",
+      "name": "datos_next_flujo2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JM99OhwFjowpstBW",
+          "mode": "list",
+          "cachedResultName": "Creación/Edición/Borrado personajes v2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1340,
+        100
+      ],
+      "id": "c30177c1-4406-4247-a64b-5f6418e14bf5",
+      "name": "Execute creacion"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JM99OhwFjowpstBW",
+          "mode": "list",
+          "cachedResultName": "Creación/Edición/Borrado personajes v2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1820,
+        -120
+      ],
+      "id": "2dfbf477-7a79-42b3-b196-cd14fc98d476",
+      "name": "Execute edicion/elim"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "dvmteHX6ADN4hTXy",
+          "mode": "list",
+          "cachedResultName": "Batalla"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1680,
+        -340
+      ],
+      "id": "bd1008d3-6152-44c6-a08a-8d94bf67a977",
+      "name": "Execute batalla"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"telegram_chat_id\": {{ $('Inicio').item.json.message.chat.id }},\n  \"players.id\": \"{{ $('Supabase: inicio sesión').item.json.id }}\",\n  \"username\": \"{{ $('Supabase: inicio sesión').item.json.username }}\",\n  \"next_step\": \"{{ $json.action }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1640,
+        -120
+      ],
+      "id": "c613556d-58b3-4546-becf-d576bed1cbd4",
+      "name": "datos_next_flujo1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.data.approved;\nif (input === true) {\n  return { action: \"editar\" };\n} else {\n  return { action: \"eliminar\" };\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        -120
+      ],
+      "id": "81a9bcb9-0a0f-4c6b-bc04-3e604f7d5479",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "content": "## 🤖 Workflow de Bienvenida\n**Propósito:** Onboarding de usuarios  \n**Journey del usuario:**  \n1. 🚪 **Punto de entrada:**  \n   - Elección registro/inicio sesión  \n2. 📝 **Registro:**  \n   - Validación de credenciales  \n   - Creación de cuenta en Supabase  \n   - Mensaje de bienvenida generado por IA  \n   - Redirección automática a workflow de creación de personajes\n3. 🔐 **Login:**  \n   - Autenticación contra Supabase  \n   - Manejo de errores con reintentos  \n4. 🎮 **Post-login:**  \n   - Menú principal con opciones:  \n     - 🗡️ Iniciar combate  > Workflow de Batalla\n     - 🛠️ Gestionar personaje > Workflow de Creacion/Edicion/Borrado de personajes",
+        "height": 420,
+        "width": 960
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -460,
+        -740
+      ],
+      "typeVersion": 1,
+      "id": "0d352fbc-70e0-477f-bf22-97718a56fe34",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "Telegram: sing_up/log_in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Telegram: log in",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: solicitud registro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: solicitud registro": {
+      "main": [
+        [
+          {
+            "node": "Supabase: registro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: sing_up/log_in": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: log in": {
+      "main": [
+        [
+          {
+            "node": "Supabase: inicio sesión",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "log_in correcto?": {
+      "main": [
+        [
+          {
+            "node": "Telegram: next_setp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "log_in=erroneo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "log_in=erroneo": {
+      "main": [
+        [
+          {
+            "node": "Telegram: log in",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Bienvenida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bienvenida": {
+      "main": [
+        [
+          {
+            "node": "datos_next_flujo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "datos_next_flujo": {
+      "main": [
+        [
+          {
+            "node": "Execute creacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase: registro": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase: inicio sesión": {
+      "main": [
+        [
+          {
+            "node": "log_in correcto?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: next_setp": {
+      "main": [
+        [
+          {
+            "node": "Switch4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: next_setp1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "datos_next_flujo2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: next_setp1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "datos_next_flujo2": {
+      "main": [
+        [
+          {
+            "node": "Execute batalla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute creacion": {
+      "main": [
+        []
+      ]
+    },
+    "datos_next_flujo1": {
+      "main": [
+        [
+          {
+            "node": "Execute edicion/elim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "datos_next_flujo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2998bb46-d27d-466a-b086-a0b91c609d90",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fb40b9a4f57084950ea960f301b80dd1b977e702e7cf3108b98e299d24cc0fa3"
+  },
+  "id": "K2H3HK33luiZqVmD",
+  "tags": []
+}
