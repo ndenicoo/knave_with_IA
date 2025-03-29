@@ -48,7 +48,7 @@ La arquitectura del sistema IA Game Master para Knave combina la potencia de mic
 3. **Simulación de Combate:**
    - El workflow "Batalla.json" inicia el proceso de combate.
    - Se consulta un microservicio en Heroku (desarrollado en Python) para obtener un monstruo aleatorio y calcular sus estadísticas.
-   - GPT-4 genera la narrativa del combate y configura los parámetros de la batalla.
+   - GPT-4o genera la narrativa del combate y configura los parámetros de la batalla.
    - Los datos de combate se envían nuevamente a otro microservicio en Heroku para resolver el resultado del enfrentamiento.
    - Dependiendo del resultado (victoria o derrota), se actualiza la experiencia y el nivel del personaje mediante el workflow "Actualizacion_nivel.json".
 
